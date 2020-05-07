@@ -56,15 +56,4 @@ librar(mice) # Multivariate imputation package
 library(VIM) # Visualization and imputation of missing values package
 ?kNN # Based on "Grower distance". Look it up
 DATA <- kNN(DATA, variable = c("IMPUTE_COLS"), k = xx) # KNN imputation creates new logical columns
-<<<<<<< HEAD
 IMPUTED_DATA <- subset(DATA, select = COL_NAME:COL_NAME)
-=======
-IMPUTEDL_DATA <- subset(DATA, select = COL_NAME:COL_NAME)
->>>>>>> 47772e68cd802d8c67a39b52c975422d7d77b0c5
-
-
-
-
-
-
-
