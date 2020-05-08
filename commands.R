@@ -51,6 +51,7 @@ for(i in 1:nrow(DATA)){
 
 # OR ------
 librar(mice) # Multivariate imputation package
+IMPUTED_DATA <- mice(DATA, method = , m = )
 
 # KNN Imputation
 library(VIM) # Visualization and imputation of missing values package
