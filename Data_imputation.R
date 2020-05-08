@@ -1,6 +1,6 @@
 ### R Useful commands.
 
-## Missing values
+## Missing values - Look at onenote for concepts.
 
 # Checking missing values
 summary(DATA)
