@@ -5,7 +5,7 @@
 # Checking missing values
 summary(DATA)
 is.na(DATA)
-which(is.na(DATA)) # Returns index
+which(is.na(DATA), arr.ind = TRUE) # Returns index
 sum(is.na(DATA)) # Returns no. of missing values
 complete.cases(DATA) # Returns logical values
 DATA[!complete.cases(DATA)] # Returns rows with incomplete data

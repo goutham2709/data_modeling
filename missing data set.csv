@@ -1,0 +1,6 @@
+Character,Numeric,Logical,Date
+this is a charcaccter,123,Yes,05-11-20
+char1,,No,06-11-20
+char2,456,,07-11-20
+char3,789,Yes,
+,378,No,08-11-20

@@ -1,0 +1,139 @@
+---
+title: "Cars"
+author: "Goutham"
+date: "5/11/2020"
+output: html_document
+---
+```{r Load libraries}
+library(tidyverse)
+```
+
+```{r Data input}
+# Read the data file 
+cars <- read.csv("CARS.csv")
+names(cars)
+
+# Change "make" column name
+colnames(cars)[1] <- "Make"
+names(cars)
+```
+
+```{r Structuring the data}
+str(cars) ## Doing necessary structural transformations
+cars$Cylinders <- as.factor(cars$Cylinders) # Convert cylilnder from int to factor
+cars$Model <- as.character(cars$Model) # Convert Model from factor to character
+```
+
+```{r}
+# Methods to convert currency that didn't work
+cars$MSRP <- as.numeric(cars$MSRP)
+
+cars1 <- cars
+as.integer(cars1$MSRP)
+as.numeric(sub('$','',as.character(cars1$MMSRP),fixed=TRUE))
+as.numeric(sub("\\$","", cars1$MSRP))
+```
+
+
+```{r}
+# Convert currency from factor to number function
+convertCurrency <- function(currency) {
+  currency1 <- sub('$','',as.character(currency),fixed=TRUE)
+  currency2 <- as.numeric(gsub('\\,','',as.character(currency1))) 
+  currency2
+}
+
+cars1$MSRP <- convertCurrency(cars1$MSRP)
+rm(cars1)
+```
+
+```{r}
+cars$MSRP <- convertCurrency(cars$MSRP)
+cars$Invoice <- convertCurrency(cars$Invoice)
+
+str(cars)
+
+## NOW, the dataset is in the format reuqired for analysis
+```
+
+```{r Missing values}
+sum(is.na(cars)) # Missing values in cars dataset
+which(is.na(cars), arr.ind = TRUE) # Index of missing values
+
+# Missing value analysis
+table(complete.cases(cars))
+cars[!complete.cases(cars),] # Selecting observations with missing data
+
+cars %>% filter(cars$Make == "Mazda" & cars$EngineSize < 2) %>% View()
+cars %>% filter(cars$Make == "Mazda" & cars$EngineSize > 1) %>% View()
+
+# Imputing "4" for missing values after the analysis
+cars[is.na(cars)] <- 4
+
+# Checking the imputation
+table(complete.cases(cars))
+```
+
+```{r Sampling}
+# Sampling - using simple random sampling
+train_size <- floor(0.75 * nrow(cars)) # Set size of training dataset
+set.seed(123)
+train <- sample(seq_len(nrow(cars)), size = train_size) # Generates random numbers
+
+train_set <- cars[train, ]
+test_set <- cars[-train, ]
+
+rm(train, train_size)
+```
+
+```{r Outlier treatment}
+summary(cars)
+str(cars)
+
+# Using Turkey's method of outlier detection
+boxplot(cars$MSRP, main = "MSRP")
+boxplot.stats(cars$MSRP)
+summary(cars$MSRP)
+length(boxplot(cars$MSRP)$out)/nrow(cars) # 6.3% of data is outlying
+outliers <- boxplot(cars$MSRP)$out
+outliers_index <- which(cars$MSRP %in% outliers) # Returns indexes of outliers
+
+
+boxplot(cars$Invoice, main = "Invoice")
+boxplot.stats(cars$Invoice)
+length(boxplot.stats(cars$Invoice)$out)/nrow(cars) # same 6.3% of data is outlying
+
+boxplot(cars$Horsepower, main = "HP")
+boxplot.stats(cars$Horsepower)
+length(boxplot.stats(cars$Horsepower)$out)/nrow(cars) # 1.6% of data is outlying
+
+boxplot(cars$MPG_City, main = "MPG_City")
+boxplot.stats(cars$MPG_City)
+length(boxplot.stats(cars$MPG_City)$out)/nrow(cars) # 5.8% of data is outlying
+
+boxplot(cars$MPG_Highway, main = "MPG_Highway")
+boxplot.stats(cars$MPG_Highway)
+length(boxplot.stats(cars$MPG_Highway)$out)/nrow(cars) # 5.6% of data is outlying
+
+boxplot(cars$Weight, main = "Weight")
+boxplot.stats(cars$Weight)
+length(boxplot.stats(cars$Weight)$out)/nrow(cars) # 3.2% of data is outlying
+
+boxplot(cars$Wheelbase, main = "Wheelbase")
+boxplot.stats(cars$Wheelbase)
+length(boxplot.stats(cars$Wheelbase)$out)/nrow(cars) # 4.4% of data is outlying
+
+boxplot(cars$Length, main = "Length")
+boxplot.stats(cars$Length)
+length(boxplot.stats(cars$Length)$out)/nrow(cars) # 3.7% of data is outlying
+```
+
+```{r Univariate analysis}
+
+```
+
+```{r Bi variate analysis}
+
+```
+
+
