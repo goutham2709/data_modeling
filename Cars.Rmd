@@ -10,12 +10,13 @@ library(tidyverse)
 
 ```{r Data input}
 # Read the data file 
-cars <- read.csv("CARS.csv")
+cars <- read.csv("CARS.csv", na.strings = c("", "NA"))
 names(cars)
 
 # Change "make" column name
 colnames(cars)[1] <- "Make"
 names(cars)
+attributes(cars)
 ```
 
 ```{r Structuring the data}
