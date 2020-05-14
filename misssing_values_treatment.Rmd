@@ -1,0 +1,87 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+```{r libraries}
+library(tidyverse)
+library(missForest)
+library(VIM)
+library(mice)
+library(BaylorEdPsych)
+```
+
+```{r load data}
+# Load cars data set
+cars <- read.csv("CARS.csv", na.strings = c("","NA"))
+dim(cars)
+str(cars)
+colnames(cars)[1] <- "Make"
+
+sum(is.na(cars))
+```
+
+```{r delete random observations}
+miss.cars <- cars
+miss.cars <- missForest::prodNA(miss.cars, noNA = 0.15) # deletes 20% of data
+miss.cars %>% View()
+save(miss.cars, file = "miss.cars.RData")
+
+```
+
+```{r missing value analysis}
+summary(miss.cars)
+
+PercentMiss <- function(x){sum(is.na(x))/nrow(cars)*100}
+
+miss.per.cars <- apply(miss.cars, 2, PercentMiss)
+
+# miss.per.cars <- data.frame(miss.per.cars)
+# colnames(miss.per.cars)[1] <- "percent"
+# miss.per.cars$cols <- rownames(miss.per.cars)
+# rownames(miss.per.cars) <- NULL
+
+barplot(miss.per.cars, xlab ="Predictor variable", ylab = "Miss percentage", main = "Percentage of missing values")
+```
+
+```{r missing set and good set}
+miss.set <- miss.cars[!complete.cases(miss.cars),]
+good.set <- miss.cars[complete.cases(miss.cars),]
+```
+
+```{r littles MCAR test}
+BaylorEdPsych::LittleMCAR(miss.cars)
+```
+
+Littles MCAR Test:
+H0: Missing values are MCAR
+H1: Missing values are not MCAR
+
+P-value is close to 0 => Reject H0 => Either missing at MAR or MNAR
+
+"MICE" package can be used. MICE assumes that the data is Missing at Random (MAR)
+"MICE" imputes data on a variable by variable basis by specifying an imputation model per variable.
+  Eg: Suppose we have X1, X2….Xk variables. If X1 has missing values, then it will be regressed on other variables X2 to Xk. The missing values in X1 will be then replaced by predictive values obtained. Similarly, if X2 has missing values, then X1, X3 to Xk variables will be used in prediction model as independent variables. Later, missing values will be replaced with predicted values.
+
+
+```{r}
+
+```
+
+
+
+Missing values imputing methods:
+  Single Imputation: Single refers to the fact that you come up with a single estimate of the missing value.
+    Do nothing
+    Listwise deletion
+    Pariwise deletion
+    Mean imputation
+    Substitution
+    Hot deck imputation
+    Cold deck imputation
+    Regression imputation
+    Stochastic regression imputation
+    Intrapolation and extrapolation
+    
+  Multiple Imputation

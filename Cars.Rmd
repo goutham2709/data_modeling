@@ -130,7 +130,9 @@ length(boxplot.stats(cars$Length)$out)/nrow(cars) # 3.7% of data is outlying
 ```
 
 ```{r Univariate analysis}
+library(dlookr)
 
+dlookr::describe(cars) %>% View()
 ```
 
 ```{r Bi variate analysis}
