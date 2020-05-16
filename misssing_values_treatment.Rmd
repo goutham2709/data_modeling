@@ -2,7 +2,7 @@
 title: "R Notebook"
 output: html_notebook
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 ```{r libraries}
 library(tidyverse)
@@ -10,6 +10,9 @@ library(missForest)
 library(VIM)
 library(mice)
 library(BaylorEdPsych)
+library(Hmisc) # missing values
+library(missForest)
+library(naniar)
 ```
 
 ```{r load data}
@@ -19,7 +22,9 @@ dim(cars)
 str(cars)
 colnames(cars)[1] <- "Make"
 
-sum(is.na(cars))
+colSums(is.na(cars))
+
+cars$Cylinders <- as.factor(cars$Cylinders)
 ```
 
 ```{r delete random observations}
@@ -62,12 +67,67 @@ P-value is close to 0 => Reject H0 => Either missing at MAR or MNAR
 
 "MICE" package can be used. MICE assumes that the data is Missing at Random (MAR)
 "MICE" imputes data on a variable by variable basis by specifying an imputation model per variable.
-  Eg: Suppose we have X1, X2….Xk variables. If X1 has missing values, then it will be regressed on other variables X2 to Xk. The missing values in X1 will be then replaced by predictive values obtained. Similarly, if X2 has missing values, then X1, X3 to Xk variables will be used in prediction model as independent variables. Later, missing values will be replaced with predicted values.
+
+Eg: Suppose we have X1, X2….Xk variables. If X1 has missing values, then it will be regressed on other variables X2 to Xk. The missing values in X1 will be then replaced by predictive values obtained. Similarly, if X2 has missing values, then X1, X3 to Xk variables will be used in prediction model as independent variables. Later, missing values will be replaced with predicted values.
+
+By default, linear regression is used to predict continuous missing values. Logistic regression is used for categorical missing values. Once this cycle is complete, multiple data sets are generated. These data sets differ only in imputed missing values. Generally, it’s considered to be a good practice to build models on these data sets separately and combining their results.
+
+```{r exp set}
+exp.cars <- miss.cars # experimental set
+str(exp.cars)
+names(exp.cars)
+colSums(is.na(exp.cars))
+```
+
+```{r exp continuous set}
+exp.cars1 <- exp.cars
+exp.cars1 <- subset(exp.cars, select = c(10,11,12,13,14,15))
+str(exp.cars1)
+colSums(is.na(exp.cars1))
+```
+
+```{r}
+explanitory <- c()
+```
+
+```{r visualizations}
+naniar::vis_miss(exp.cars)
+naniar::n_var_miss(exp.cars)
+naniar::gg_miss_upset(exp.cars, nsets = n_var_miss(exp.cars)) # combinations and intersections of missingness amongst variables (, nintersects = NA)
+
+ggplot(exp.cars, aes(exp.cars$EngineSize, exp.cars$Horsepower)) + 
+  geom_miss_point() +
+  facet_wrap(~ exp.cars$DriveTrain)# naniar package
+
+#gg_miss_ ....
+gg_miss_var(exp.cars, show_pct = TRUE) # facet = ... But needs to have no NAs
+gg_miss_which(exp.cars)
+```
+
+
+```{r Hmisc}
+impute.cars <- Hmisc::aregImpute(~ EngineSize + Horsepower + MPG_City+ Weight + Wheelbase + Length, data = exp.cars, n.impute = 5)
+
+impute.cars$imputed$Horsepower
+```
+
+```{r mice}
+impute.cars1 <- mice(exp.cars, m=5, maxit = 10, method = 'pmm', seed = 500)
+```
+
+
 
 
 ```{r}
+library(mice)
+library(VIM)
 
+head(nhanes)
+?nhanes
+nhanes %>% View()
 ```
+
+
 
 
 
