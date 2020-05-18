@@ -112,19 +112,74 @@ impute.cars$imputed$Horsepower
 ```
 
 ```{r mice}
-impute.cars1 <- mice(exp.cars, m=5, maxit = 10, method = 'pmm', seed = 500)
+# https://www.youtube.com/watch?v=sNNoTd7xI-4
+
+names(exp.cars)
+exp.cars.cont <- exp.cars[c("Horsepower", "MPG_City", "Weight", "EngineSize")]
+colSums(is.na(exp.cars.cont))
+which(is.na(exp.cars.cont), arr.ind = TRUE)
+
+impute.cars1 <- mice(exp.cars.cont, m=10, maxit = 10, method = 'pmm', seed = 500)
+
+imp1 <- complete(impute.cars1, 1)
+imp2 <- complete(impute.cars1, 2)
+imp10 <- complete(impute.cars1, 10)
+
+
+lm(MPG_City~Horsepower, data = imp1)
+lm(MPG_City~Horsepower, data = imp2)
+lm(MPG_City~Horsepower, data = imp10)
+
+fit1 <- with(impute.cars1, lm(MPG_City~Horsepower+EngineSize+Weight))
+summary(fit1) %>% View() # analysis for all the imputed datasets
+summary(pool(fit1))
+
+# compaing two imputed models
+compare.fit1 <- with(impute.cars1, lm(MPG_City~Horsepower+EngineSize+Weight, data = imp1))
+compare.fit2 <- with(impute.cars1, lm(MPG_City~Horsepower+EngineSize, data = imp2))
+
+D1(compare.fit1, compare.fit2)
+
+# ANOVA - to compare two linear models
+lm.imp1 <- lm(MPG_City~Horsepower+EngineSize, data = imp1)
+lm.imp2 <- lm(MPG_City~Horsepower+EngineSize+Weight, data = imp2)
+
+anova(lm.imp1, lm.imp2)
 ```
 
 
 
 
-```{r}
+```{r mice imputation practice}
+
+# https://www.youtube.com/watch?v=G7I1ia9qg6g
+# https://www.gerkovink.com/miceVignettes/Ad_hoc_and_mice/Ad_hoc_methods.html
 library(mice)
 library(VIM)
 
 head(nhanes)
 ?nhanes
 nhanes %>% View()
+
+barplot(colSums(is.na(nhanes)))
+
+md.pattern(nhanes)
+md.pairs(nhanes)
+
+VIM::pbox(nhanes)
+
+imputed <- mice(nhanes)
+imputed$imp$chl
+
+complete(imputed, 3)
+
+summary(lm(chl~age+hyp, data = nhanes)) # Complete case analysis - lm() auto does list wise deletion
+confint(lm(chl~age+hyp, data = nhanes))
+
+fit <- with(imputed, lm(chl~age+hyp))
+pool(fit)
+summary(pool(fit))
+imputed %>% View()
 ```
 
 
