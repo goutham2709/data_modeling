@@ -1,9 +1,44 @@
 ---
 title: "R Notebook"
 output: html_notebook
+editor_options: 
+  chunk_output_type: console
 ---
+Outliers bias the mean and variance estimates (SD, SE)
 
-```{r}
+Categorical - Unusual values (which accounts for < 10% of the dataset)
+  1. Combine all the unusuals into one category
+  2. Delete
+  
+Continuous - use boxplots, histogram
+
+&&
+Univariate
+  Use scale() to z score the data and look for any obs with +-3 => exclude
+    z-scores are distance from the mean
+  
+Multivariate
+  Mahalanobis - creates a distance from the centroid (mean of all means) - works for both uni & mulivariate
+    DEF: Mahalanobis distance is a measure of the distance between a point P and a distribution D
+  use chi-squared table, df = # variables used to calculate distance, use p < 0.001
+  
+Treatment:
+  Delete
+  Impute
+  Capping
+  Treat separately
+  
+Slightly different procedure for outliers in regression
+  
+```{r loading data}
+cars <- miss.val.treat
+cars %>% View()
+colSums(is.na(cars))
+```
+
+```{r creating mahalanobis distance for continuous}
+
+mahal.dist <- mahalanobis()
 
 ```
 

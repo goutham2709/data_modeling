@@ -182,6 +182,10 @@ summary(pool(fit))
 imputed %>% View()
 ```
 
+```{r joining data}
+
+
+```
 
 
 
